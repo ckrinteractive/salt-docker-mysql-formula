@@ -5,13 +5,13 @@
   'MYSQL_ROOT_PASSWORD': salt['pillar.get']('mysql:root_password'),
 } %}
 
-mysql:
+mysql-pulled:
   docker.pulled:
     - name: mysql
 
 mysql-container:
   require:
-     - docker: mysql
+     - docker: mysql-pulled
   docker.installed:
     - name: {{ container_name }}
     - image: mysql
@@ -20,7 +20,7 @@ mysql-container:
         - {{ env_var }}: {{ env_val }}
       {% endfor %}
 
-mysql-running:
+{{ container_name }}:
   require:
     - docker: mysql-container
   docker.running:
