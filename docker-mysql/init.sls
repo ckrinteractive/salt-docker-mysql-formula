@@ -1,6 +1,9 @@
 {% set container_name = 'mysql' %}
 {% set host_port = salt['pillar.get']('mysql:port', '3306') %}
 {% set host_ip = salt['grains.get']('mysql:host') %}
+{% set env_vars = {
+  'MYSQL_ROOT_PASSWORD': salt['pillar.get']('mysql:root_password'),
+} %}
 
 mysql:
   docker.pulled:
@@ -13,7 +16,9 @@ mysql-container:
     - name: {{ container_name }}
     - image: mysql
     - environment:
-      - MYSQL_ROOT_PASSWORD: {{ salt['pillar.get']('mysql:root_password', '')  }}
+      {% for env_var, env_val in env_vars.items() -%}
+        - {{ env_var }}: {{ env_val }}
+      {% endfor %}
 
 mysql-running:
   require:
